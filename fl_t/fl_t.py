@@ -3,14 +3,17 @@ from flet_core.alignment import center
 
 from api_manager.api_manager import ApiManager
 
-api_manager = ApiManager()
+sith_show_answers = [ft.Text("Эта страница для Ситха")]
 
+admin_panel = [ft.Text("Страница Админа")]
 
+rows = []
 def main(page: ft.Page):
     login = ft.Ref[ft.TextField]()
     password = ft.Ref[ft.TextField]()
     greetings = ft.Ref[ft.Column]()
     login_incorrect_label = ft.Text("Login incorrect", visible=False)
+    api_manager = ApiManager(page)
 
     def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
         return ft.Column(
@@ -45,15 +48,47 @@ def main(page: ft.Page):
             horizontal_alignment=align.CENTER
         )
 
+
+    def items(l_st: list):
+        rows.clear()
+        for i in range(len(l_st)):
+            dropdowns = ft.Dropdown(options=[
+                ft.dropdown.Option("True"),
+                ft.dropdown.Option("False")
+            ]
+            )
+            rows.append(
+                ft.Row([ft.TextField(value=str(l_st[i] + "?")),
+                        dropdowns
+                        ],
+                       # alignment=ft.alignment.center,
+                       # vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                       )
+            )
+        print(f'rows is items {rows}')
+        return rows
+
+    def button_submit(e):
+        answers_to_send = {}
+        print(f'Распечатываем rows:{rows}')
+        for row in rows:
+            question_text = row.controls[0].value
+            answers_to_send[question_text] = row.controls[1].value
+        print(answers_to_send)
+
+
     def button_click(e):
         greetings.current.controls.append(
             ft.Text(f'Hello {login.current.value}!')
         )
         result = api_manager.authorize(login.current.value, password.current.value)
         if result.status_code == 200:
-            route_changes("/test")
-        elif result.status_code == 401:
-            #route_changes("/")
+            if api_manager.get_role() == "USER":
+                route_changes("/test")
+            elif api_manager.get_role() == "ADMIN":
+                print("Зашел админ")
+        elif result.status_code == 400:
+            # route_changes("/")
             login_incorrect_label.visible = True
         # login.value = ""
         page.update()
@@ -73,6 +108,9 @@ def main(page: ft.Page):
     # )
 
     #### Переход между страницами
+    sith_questions_elements = [
+
+    ]
 
     def route_changes(route):
         page.views.clear()
@@ -88,11 +126,12 @@ def main(page: ft.Page):
                             ],
                             spacing=30,
                             alignment=ft.MainAxisAlignment.CENTER,
-                            vertical_alignment=ft.CrossAxisAlignment.CENTER
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+
                         ),
                         ft.Column(ref=greetings, ),
                         # ft.AppBar(title=ft.Text("Flet app"), ),
-                        # ft.ElevatedButton("Visit Store", on_click=lambda _: page.go("/store"))
+                        # ft.ElevatedButton("Submit", on_click=lambda _: page.go("/test"))
                     ],
                 )
             )
@@ -108,19 +147,40 @@ def main(page: ft.Page):
         #         )
         #     )
         if route == "/test":
+            print("route /test")
             page.route = "/test"
             page.go(page.route)
             elevated_button = ft.ElevatedButton("Go Home", on_click=lambda _: page.go("/"))
             elevated_button.visible = False
+            questions = list(api_manager.get_question().values())
+            recrut_questions_elements = items(questions)
+            print(recrut_questions_elements[1].controls[0].value)
+            # recrut_answers_elements = items_id(questions)
             page.views.append(
-                    ft.View(
-                        "/test",
-                        [
-                            ft.AppBar(title=ft.Text("Test")),
-                            elevated_button,
-                        ]
-                    )
+                ft.View(
+                    "/test",
+                    # recrut_questions_elements
+                    [
+                        ft.Column(
+                            recrut_questions_elements,
+                            spacing=30,
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+
+                        ),
+                        ft.Row(ref=greetings, ),
+                        ft.ElevatedButton("Submit", on_click=button_submit, ),
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    # ft.ElevatedButton("Submit", on_click=lambda _: page.go("/test")),
+                    # ft.AppBar(title=ft.Text("Test")),
+                    # ft.AppBar(title=ft.Text(api_manager.read_token())),
+                    # ft.AppBar(title=ft.Text(api_manager.get_question())),
+                    # elevated_button,
                 )
+            )
         elif route == "/":
             page.route = route
             page.views.append(
@@ -128,7 +188,23 @@ def main(page: ft.Page):
                     "/",
                     [
                         ft.AppBar(title=ft.Text("Flet")),
-                        ]
+                    ]
+                )
+            )
+        elif route == "/sith":
+            page.route = route
+            page.views.append(
+                ft.View(
+                    "/sith",
+                    sith_show_answers
+                )
+            )
+        elif route == "/admin":
+            page.route = route
+            page.views.append(
+                ft.View(
+                    "/admin",
+                    admin_panel
                 )
             )
         page.update()
