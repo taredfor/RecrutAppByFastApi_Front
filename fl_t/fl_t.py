@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from flet_core.alignment import center
 
@@ -6,6 +7,14 @@ from api_manager.api_manager import ApiManager
 sith_show_answers = [ft.Text("Эта страница для Ситха")]
 
 admin_panel = [ft.Text("Страница Админа")]
+
+logging.basicConfig(level=logging.INFO, filename="py_log.log",filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s")
+logging.debug("A DEBUG Message")
+logging.info("An INFO")
+logging.warning("A WARNING")
+logging.error("An ERROR")
+logging.critical("A message of CRITICAL severity")
 
 rows = []
 def main(page: ft.Page):
@@ -72,9 +81,12 @@ def main(page: ft.Page):
         answers_to_send = {}
         print(f'Распечатываем rows:{rows}')
         for row in rows:
+            print(type(row))
             question_text = row.controls[0].value
             answers_to_send[question_text] = row.controls[1].value
         print(answers_to_send)
+        #return answers_to_send
+        api_manager.sent_answer_to_back(answers_to_send)
 
 
     def button_click(e):
@@ -85,6 +97,7 @@ def main(page: ft.Page):
         if result.status_code == 200:
             if api_manager.get_role() == "USER":
                 route_changes("/test")
+                print("Зашел юзер")
             elif api_manager.get_role() == "ADMIN":
                 print("Зашел админ")
         elif result.status_code == 400:
@@ -154,7 +167,7 @@ def main(page: ft.Page):
             elevated_button.visible = False
             questions = list(api_manager.get_question().values())
             recrut_questions_elements = items(questions)
-            print(recrut_questions_elements[1].controls[0].value)
+            #print(recrut_questions_elements[1].controls[0].value)
             # recrut_answers_elements = items_id(questions)
             page.views.append(
                 ft.View(
