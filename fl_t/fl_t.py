@@ -3,7 +3,7 @@ import logging
 import flet
 import flet as ft
 from flet_core.alignment import center
-
+from validator.validator import validate_password
 from api_manager.api_manager import ApiManager
 
 sith_show_answers = [ft.Text("Эта страница для Ситха")]
@@ -34,6 +34,8 @@ def main(page: ft.Page):
     first_name = ft.Ref[ft.TextField]()
     second_name = ft.Ref[ft.TextField]()
     e_mail = ft.Ref[ft.TextField]()
+    planet = ft.Ref[ft.TextField]()
+    success_field = ft.Ref[ft.Text]()
     api_manager = ApiManager(page)
 
     def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
@@ -100,6 +102,16 @@ def main(page: ft.Page):
                              width=200,
                              height=50,
                              ),
+                ft.Dropdown(ref=planet,
+                             label='Planet',
+                             autofocus=True,
+                             width=200,
+                             height=50,
+                             options=[
+                                ft.dropdown.Option("MARS"),
+                                ft.dropdown.Option("JUPITER")
+                                ]
+                             ),
                 ft.TextField(ref=e_mail,
                              label='email',
                              autofocus=True,
@@ -115,20 +127,28 @@ def main(page: ft.Page):
                              height=50,
                              ),
                 ft.ElevatedButton("To come in",
-                                  on_click=button_click,
+                                  on_click=button_click_create_recrut,
                                   # url="store",
                                   url_target="_self",
                                   width=200,
                                   height=50,
-                                  )
+                                  visible=False
+                                  ),
                 #     content=ft.Column(
                 #         alignment=ft.MainAxisAlignment.CENTER,
                 #         horizontal_alignment=align, )
-
+                ft.Text(
+                        ref=success_field,
+                        value="Корректный пароль",
+                        text_align=center,
+                        width=200,
+                        height=50,
+                        color='RED',
+                        disabled=False)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=align.CENTER,
-            visible=False
+            visible=True
         )
 
 
@@ -189,7 +209,24 @@ def main(page: ft.Page):
         route_changes("/registration")
         page.update()
 
+    def button_click_create_recrut(e):
+        #page.views.clear()
+        if validate_password(password.current.value):
 
+            user_information = {"login": login.current.value,
+                            "first_name": first_name.current.value,
+                            "second_name": second_name.current.value,
+                            "planet": planet.current.value,
+                            "e_mail": e_mail.current.value,
+                            "pswd": password.current.value,
+                            }
+            api_manager.sent_user_information_to_back(user_information)
+            route_changes("/")
+            page.update()
+        else:
+            success_field.current.visible = True
+            success_field.current.value = "Пароль не соответсвует заданным параметрам"
+            page.update()
     def route_changes(route):
         page.views.clear()
         if page.route == "/":
@@ -276,8 +313,9 @@ def main(page: ft.Page):
                                       vertical_alignment=ft.MainAxisAlignment.CENTER,
                                       ))
         elif route == "/registration":
-            page.route = "/registration"
+            page.route = route
             page.go(page.route)
+            password_status = validate_password(password.current.value)
             page.views.append(
                 ft.View(
                     "/registration",
