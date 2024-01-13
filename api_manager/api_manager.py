@@ -86,6 +86,8 @@ class ApiManager():
         print(payload)
         #payload = json.dumps(payload)
         requests.post(f'{self.host}/post_answers', headers={"Authorization": f'Bearer {self.access_token}'}, data=json.dumps(payload))
+    def sent_user_information_to_back(self, payload: dict):
+        requests.post(f'{self.host}/add-recrut', data=json.dumps(payload))
     def get_user_hire_status(self):
         result = requests.get(f'{self.host}/status', headers={"Authorization": f'Bearer {self.access_token}'})
         return result.json()["recrut_status"]
