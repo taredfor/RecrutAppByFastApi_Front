@@ -5,6 +5,7 @@ import flet as ft
 from flet_core.alignment import center
 from validator.validator import validate_password
 from api_manager.api_manager import ApiManager
+from ui_elements import RegistrationFormTextField
 
 sith_show_answers = [ft.Text("Эта страница для Ситха")]
 
@@ -83,27 +84,9 @@ def main(page: ft.Page):
     def form_for_user_registration(align: ft.CrossAxisAlignment):
         return ft.Column(
             [
-                ft.TextField(ref=login,
-                             label='Login',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
-                ft.TextField(ref=first_name,
-                             label='First name',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
-                ft.TextField(ref=second_name,
-                             label='Second name',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
+                RegistrationFormTextField('Login', login),
+                RegistrationFormTextField('First name', first_name),
+                RegistrationFormTextField('Second name', second_name),
                 ft.Dropdown(ref=planet,
                              label='Planet',
                              autofocus=True,
@@ -114,20 +97,8 @@ def main(page: ft.Page):
                                 ft.dropdown.Option("JUPITER")
                                 ]
                              ),
-                ft.TextField(ref=e_mail,
-                             label='email',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
-                ft.TextField(ref=password,
-                             label='Password',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
+                RegistrationFormTextField('email', e_mail),
+                RegistrationFormTextField('Password', password),
                 ft.ElevatedButton("To come in",
                                   on_click=button_click_create_recrut,
                                   # url="store",
@@ -136,9 +107,6 @@ def main(page: ft.Page):
                                   height=50,
                                   visible=False
                                   ),
-                #     content=ft.Column(
-                #         alignment=ft.MainAxisAlignment.CENTER,
-                #         horizontal_alignment=align, )
                 ft.Text(
                         ref=success_field,
                         value="Корректный пароль",
