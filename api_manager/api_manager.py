@@ -91,11 +91,16 @@ class ApiManager():
     def get_user_hire_status(self):
         result = requests.get(f'{self.host}/status', headers={"Authorization": f'Bearer {self.access_token}'})
         return result.json()["recrut_status"]
+    def validate_user_login(self, user_login: str):
+        result = requests.get(f'{self.host}/is_login_exists', data=json.dumps({"user_login": user_login}))
+        return result.json()["login_exists"]
+    def validate_user_email(self, e_mail: str):
+        result = requests.get(f'{self.host}/is_email_exists', data=json.dumps({"e_mail": e_mail}))
+        return result.json() ["email_exists"]
+
 
 if __name__ == "__main__":
     api_m = ApiManager(Page())
     #print(api_m.authorize("jobs", "string").json())
     #print(api_m.authorize("jobs", "string").json())
     #print(api_m.get_questions().json())
-    print(api_m.read_items().json())
-    print(ap)

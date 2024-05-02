@@ -58,7 +58,7 @@ def main(page: ft.Page):
                              height=50,
                              ),
                 ft.ElevatedButton("To come in",
-                                  on_click=button_click,
+                                  on_click=button_click_create_recrut,
                                   # url="store",
                                   url_target="_self",
                                   width=200,
@@ -165,7 +165,7 @@ def main(page: ft.Page):
         page.go("/test")
         page.update()
 
-    def button_click(e):
+    def button_click_create_recrut(e):
         greetings.current.controls.append(
             ft.Text(f'Hello {login.current.value}!')
         )
@@ -176,7 +176,7 @@ def main(page: ft.Page):
             if api_manager.get_role() == "RECRUT":
                 get_user_id_from_answers = api_manager.get_user_id_from_answers()
                 data = get_user_id_from_answers
-                route_changes("/test")
+                page.go("/test")
             elif api_manager.get_role() == "ADMIN":
                 print("Зашел админ")
         elif result.status_code == 400:
@@ -188,7 +188,7 @@ def main(page: ft.Page):
 
     def button_click_registration_form(e):
         page.views.clear()
-        route_changes("/registration")
+        page.go("/registration")
         page.update()
 
     # 1. Вынести if в отдельный метод. if route == '/sith' -> def route_sith(page: ft.Page)
@@ -250,6 +250,7 @@ def main(page: ft.Page):
     def route_registration(page: ft.Page):
         page.route = "/registration"
         page.go(page.route)
+        print(api_manager.validate_user_login("sdsdsd"))
         page.views.append(
             ft.View(
                 "/registration",

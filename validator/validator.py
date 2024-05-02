@@ -1,3 +1,5 @@
+import re
+
 def validate_password(password: str):
     digits = '1234567890'
     upper_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -19,3 +21,6 @@ def validate_password(password: str):
         result = False
     return result
 
+def validate_email(email: str):
+    pattern = r"^[-\w\.]+@([-\w]+\.)+[-\w]{2,4}$" # TODO:исправить валидацию приема кириллицы
+    return bool(re.match(pattern, email))
