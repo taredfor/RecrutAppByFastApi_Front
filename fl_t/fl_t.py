@@ -5,7 +5,7 @@ import flet as ft
 from flet_core.alignment import center
 from validator.validator import validate_password
 from api_manager.api_manager import ApiManager
-from ui_elements import RegistrationFormTextField
+from fl_t.ui_elements import RegistrationFormTextField, Button
 
 sith_show_answers = [ft.Text("Эта страница для Ситха")]
 
@@ -40,42 +40,15 @@ def main(page: ft.Page):
     planet = ft.Ref[ft.TextField]()
     success_field = ft.Ref[ft.Text]()
     api_manager = ApiManager(page)
+    login_incorrect_label = ft.Text("Add Login", visible=True)
 
     def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
         return ft.Column(
             [
-                ft.TextField(ref=login,
-                             label='Login',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
-                ft.TextField(ref=password,
-                             label='Password',
-                             autofocus=True,
-                             text_align=center,
-                             width=200,
-                             height=50,
-                             ),
-                ft.ElevatedButton("To come in",
-                                  on_click=button_click_create_recrut,
-                                  # url="store",
-                                  url_target="_self",
-                                  width=200,
-                                  height=50,
-                                  ),
-                ft.ElevatedButton("Registration",
-                                  on_click=button_click_registration_form,
-                                  # url="store",
-                                  url_target="_self",
-                                  width=200,
-                                  height=50,
-                                  )
-                #     content=ft.Column(
-                #         alignment=ft.MainAxisAlignment.CENTER,
-                #         horizontal_alignment=align, )
-
+                RegistrationFormTextField('Login', login),
+                RegistrationFormTextField('Password', password),
+                Button("To come in", button_click_create_recrut),
+                Button("Registration", button_click_registration_form),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=align.CENTER
@@ -99,14 +72,7 @@ def main(page: ft.Page):
                              ),
                 RegistrationFormTextField('email', e_mail),
                 RegistrationFormTextField('Password', password),
-                ft.ElevatedButton("To come in",
-                                  on_click=button_click_create_recrut,
-                                  # url="store",
-                                  url_target="_self",
-                                  width=200,
-                                  height=50,
-                                  visible=False
-                                  ),
+                Button("To come in", button_click_create_recrut, False),
                 ft.Text(
                         ref=success_field,
                         value="Корректный пароль",
@@ -139,28 +105,18 @@ def main(page: ft.Page):
         )
         result = api_manager.authorize(login.current.value,
                                        password.current.value)
-        print(result)
         if result.status_code == 200:
             if api_manager.get_role() == "RECRUT":
-                get_user_id_from_answers = api_manager.get_user_id_from_answers()
-                data = get_user_id_from_answers
                 page.go("/test")
             elif api_manager.get_role() == "ADMIN":
                 print("Зашел админ")
-        elif result.status_code == 400:
-            # route_changes("/")
-            login_incorrect_label.visible = True
-        # login.value = ""
+        login_incorrect_label.visible = (result.status_code == 400)
         page.update()
-        # password.current.focus()
 
     def button_click_registration_form(e):
         page.views.clear()
         page.go("/registration")
         page.update()
-
-    # 1. Вынести if в отдельный метод. if route == '/sith' -> def route_sith(page: ft.Page)
-    # 2. Добавить пару route_string:method в route_methods
 
     def route_default(page: ft.Page):
         page.views.append(
@@ -205,7 +161,7 @@ def main(page: ft.Page):
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
                 ft.Row(ref=greetings, ),
-                ft.ElevatedButton("Submit", on_click=button_submit, ),
+                ft.ElevatedButton("Submit", on_click=button_submit),
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             vertical_alignment=ft.MainAxisAlignment.CENTER,
@@ -216,9 +172,8 @@ def main(page: ft.Page):
             page.views.append(view_test)
 
     def route_registration(page: ft.Page):
-        page.route = "/registration"
         page.go(page.route)
-        print(api_manager.validate_user_login("sdsdsd"))
+        print("Test")
         page.views.append(
             ft.View(
                 "/registration",
@@ -298,8 +253,6 @@ def main(page: ft.Page):
                 ft.Row([answer_text_field,
                         dropdowns
                         ],
-                       # alignment=ft.alignment.center,
-                       # vertical_alignment=ft.CrossAxisAlignment.CENTER,
                        )
             )
         print(f'rows is items {rows}')
