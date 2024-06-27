@@ -6,8 +6,8 @@ import time
 
 
 class RegistrationFormTextField(
-    ft.TextField):
-    def __init__(self, label: str, ref: ft.Ref, incorrect_label: str = None,
+    ft.TextField):      #TODO поменять тип аргумента incorrect_label
+    def __init__(self, label: str, incorrect_label = None,
                  outside_validator: Callable = None, parent_page: ft.Page = None,
                  good_validate_text: str = None, bad_validate_text: str =None):
         self.incorrect_label = incorrect_label
@@ -16,7 +16,7 @@ class RegistrationFormTextField(
         self.page = parent_page
         self.good_validate_text = good_validate_text
         self.bad_validate_text = bad_validate_text
-        super().__init__(ref=ref, label=label, autofocus=True,
+        super().__init__(label=label, autofocus=True,
                          text_align=center, on_change=self.validate,
                          width=200, height=50)
 

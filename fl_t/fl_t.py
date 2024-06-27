@@ -35,7 +35,8 @@ api_manager = None
 
 
 def main(page: ft.Page):
-    login = ft.Ref[ft.TextField]()
+
+
     password = ft.Ref[ft.TextField]()
     greetings = ft.Ref[ft.Column]()
     # login_incorrect_label = ft.Text("Login incorrect", visible=False)
@@ -55,7 +56,14 @@ def main(page: ft.Page):
                                               text_align=center)
     email_incorrect_label = ft.Text("Email", visible=True)
 
-    url_text_fileds = [login, password, e_mail, main_password, second_password]
+    url_text_fileds = [password, e_mail, main_password, second_password]
+
+    login = RegistrationFormTextField('Login',
+        login_incorrect_label,
+        api_manager.validate_user_login,
+        page, "Login is Free",
+        "Login exists"
+        )
 
     def button_submit(e):
         main_answer_to_send = []
@@ -112,12 +120,7 @@ def main(page: ft.Page):
             [
                 ft.Row(
                     [
-                        RegistrationFormTextField('Login', login,
-                                                  login_incorrect_label,
-                                                  api_manager.validate_user_login,
-                                                  page, "Login is Free",
-                                                  "Login exists"
-                                                  ),
+                        login,
                         login_incorrect_label
                     ]
                 ),
