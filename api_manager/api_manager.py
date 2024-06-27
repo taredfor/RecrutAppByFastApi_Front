@@ -93,7 +93,7 @@ class ApiManager():
         return result.json()["recrut_status"]
     def validate_user_login(self, user_login: str):
         result = requests.get(f'{self.host}/is_login_exists', data=json.dumps({"user_login": user_login}))
-        return result.json()["login_exists"]
+        return not result.json()["login_exists"]
     def validate_user_email(self, e_mail: str):
         result = requests.get(f'{self.host}/is_email_exists', data=json.dumps({"e_mail": e_mail}))
         return result.json() ["email_exists"]

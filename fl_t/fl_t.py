@@ -3,9 +3,14 @@ import logging
 import flet
 import flet as ft
 from flet_core.alignment import center
-from validator.validator import validate_password
+from validator.validator import validate_password, validate_email, \
+    placeholder_validate
 from api_manager.api_manager import ApiManager
-from fl_t.ui_elements import RegistrationFormTextField, Button
+from fl_t.ui_elements import RegistrationFormTextField, Button, \
+    RegistrationFormTextFieldUserLoginPassword, \
+    RegistrationFormSecondPasswordTextField, \
+    RegistrationFormMainPasswordTextField, \
+    RegistrationButton
 
 sith_show_answers = [ft.Text("Эта страница для Ситха")]
 
@@ -33,59 +38,24 @@ def main(page: ft.Page):
     login = ft.Ref[ft.TextField]()
     password = ft.Ref[ft.TextField]()
     greetings = ft.Ref[ft.Column]()
-    login_incorrect_label = ft.Text("Login incorrect", visible=False)
+    # login_incorrect_label = ft.Text("Login incorrect", visible=False)
     first_name = ft.Ref[ft.TextField]()
     second_name = ft.Ref[ft.TextField]()
     e_mail = ft.Ref[ft.TextField]()
     planet = ft.Ref[ft.TextField]()
     success_field = ft.Ref[ft.Text]()
+    main_password = ft.Ref[ft.TextField]()
+    second_password = ft.Ref[ft.TextField]()
     api_manager = ApiManager(page)
-    login_incorrect_label = ft.Text("Add Login", visible=True)
+    login_incorrect_label = ft.Text("Add Login", visible=True,
+                                    text_align=center)
+    password_incorrect_label = ft.Text("Add Password", visible=True,
+                                       text_align=center)
+    second_password_incorrect_label = ft.Text("Second Password", visible=True,
+                                              text_align=center)
+    email_incorrect_label = ft.Text("Email", visible=True)
 
-    def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
-        return ft.Column(
-            [
-                RegistrationFormTextField('Login', login),
-                RegistrationFormTextField('Password', password),
-                Button("To come in", button_click_create_recrut),
-                Button("Registration", button_click_registration_form),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=align.CENTER
-        )
-
-    def form_for_user_registration(align: ft.CrossAxisAlignment):
-        return ft.Column(
-            [
-                RegistrationFormTextField('Login', login),
-                RegistrationFormTextField('First name', first_name),
-                RegistrationFormTextField('Second name', second_name),
-                ft.Dropdown(ref=planet,
-                             label='Planet',
-                             autofocus=True,
-                             width=200,
-                             height=50,
-                             options=[
-                                ft.dropdown.Option("MARS"),
-                                ft.dropdown.Option("JUPITER")
-                                ]
-                             ),
-                RegistrationFormTextField('email', e_mail),
-                RegistrationFormTextField('Password', password),
-                Button("To come in", button_click_create_recrut, False),
-                ft.Text(
-                        ref=success_field,
-                        value="Корректный пароль",
-                        text_align=center,
-                        width=200,
-                        height=50,
-                        color='RED',
-                        disabled=False)
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=align.CENTER,
-            visible=True
-        )
+    url_text_fileds = [login, password, e_mail, main_password, second_password]
 
     def button_submit(e):
         main_answer_to_send = []
@@ -94,12 +64,13 @@ def main(page: ft.Page):
         for row in rows:
             question_id = row.controls[0].question_id
             main_answer_to_send.append({'question_id': question_id,
-                                        'user_answer': row.controls[1].value})
+                                        'user_answer': row.controls[
+                                            1].value})
         api_manager.sent_answer_to_back(main_answer_to_send)
         page.go("/test")
         page.update()
 
-    def button_click_create_recrut(e):
+    def button_click_recrut_login(e):
         greetings.current.controls.append(
             ft.Text(f'Hello {login.current.value}!')
         )
@@ -117,6 +88,188 @@ def main(page: ft.Page):
         page.views.clear()
         page.go("/registration")
         page.update()
+
+    def button_click_logging_after_registration(e):
+        page.views.clear()
+        page.go("/login")
+        page.update()
+
+    def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
+        return ft.Column(
+            [
+                RegistrationFormTextFieldUserLoginPassword('Login', login),
+                RegistrationFormTextFieldUserLoginPassword('Password',
+                                                           password),
+                Button("To come in", button_click_recrut_login),
+                Button("Registration", button_click_registration_form),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=align.CENTER
+        )
+
+    def form_for_user_registration(align: ft.CrossAxisAlignment):
+        return ft.Column(
+            [
+                ft.Row(
+                    [
+                        RegistrationFormTextField('Login', login,
+                                                  login_incorrect_label,
+                                                  api_manager.validate_user_login,
+                                                  page, "Login is Free",
+                                                  "Login exists"
+                                                  ),
+                        login_incorrect_label
+                    ]
+                ),
+                RegistrationFormTextField('First name',
+                                          first_name,
+                                          placeholder_validate),
+                RegistrationFormTextField('Second name',
+                                          second_name,
+                                          placeholder_validate),
+                ft.Dropdown(ref=planet,
+                            label='Planet',
+                            autofocus=True,
+                            width=200,
+                            height=50,
+                            options=[
+                                ft.dropdown.Option("MARS"),
+                                ft.dropdown.Option("JUPITER")
+                            ]
+                            ),
+                ft.Row(
+                    [
+                        RegistrationFormTextField('email', e_mail,
+                                                  email_incorrect_label,
+                                                  validate_email, page,
+                                                  "Email is valid",
+                                                  "Email isn't valid"
+                                                  ),
+                        email_incorrect_label
+                    ]
+                ),
+                ft.Row(
+                    [
+                        RegistrationFormMainPasswordTextField('Main password',
+                                                  main_password, second_password,
+                                                  password_incorrect_label,
+                                                  validate_password, page,
+                                                  "Valid password",
+                                                  "Password is not correct"
+                                                  ),
+                        password_incorrect_label
+                    ]
+                ),
+                ft.Row(
+                    [
+                        RegistrationFormSecondPasswordTextField(
+                            'Second password',
+                            # TODO: исправить валидацию проверки совпадения паролей
+                            second_password, main_password,
+                            second_password_incorrect_label,
+                            None, page, "Password is equiles",
+                            "Password is not equiles"
+                            ),
+                        second_password_incorrect_label
+                    ]
+                ),
+                ft.Row(
+                [
+                    RegistrationButton(url_text_fileds, button_click_logging_after_registration)
+                ]
+            ),
+                Button("To come in", button_click_registration_form),
+            ],
+            alignment=ft.MainAxisAlignment.START,
+            horizontal_alignment=align.START,
+            visible=True
+        )
+
+        # def textbox_changed(e):
+        #     if api_manager.validate_user_login(e.control.value):
+        #         login_incorrect_label.value = "Login exists"
+        #         login_incorrect_label.color = "Red"
+        #     else:
+        #         login_incorrect_label.value = "Login is Free"
+        #         login_incorrect_label.color = "Green"
+        #     page.update()
+
+        # def textbox_changed_password(e):
+        #     if validate_password(e.control.value):
+        #         password_incorrect_label.value = "Valid password"
+        #         password_incorrect_label.color = "Green"
+        #     else:
+        #         password_incorrect_label.value = "Password is not correct"
+        #         password_incorrect_label.color = "Red"
+        #     textbox_changed_password_second(second_password.current.value)
+        #     print(type(e))
+        #     page.update()
+        #
+        # def textbox_changed_password_second(e):
+        #     if isinstance(e, ft.ControlEvent):
+        #         second_password_str = e.control.value
+        #     else:
+        #         second_password_str = e
+        #     print("main_password_str:", main_password.current.value)
+        #     main_password_str = main_password.current.value
+        #     print("main_password_str:", main_password.current.value)
+        #     if validate_password(main_password_str):
+        #         if main_password_str == second_password_str:
+        #             second_password_incorrect_label.value = "Password is equiles"
+        #             second_password_incorrect_label.color = "Green"
+        #         else:
+        #             second_password_incorrect_label.value = "Password is not equiles"
+        #             second_password_incorrect_label.color = "Red"
+        #     else:
+        #         second_password_incorrect_label.value = ""
+        #     page.update()
+
+        # def textbox_changed_email(e):
+        #     if validate_email(e.control.value):
+        #         if not api_manager.validate_user_email(e.control.value):
+        #             email_incorrect_label.value = "Email is valid"
+        #             email_incorrect_label.color = "Green"
+        #     else:
+        #         email_incorrect_label.value = "Email isn't valid"
+        #         email_incorrect_label.color = "Red"
+        #     page.update()
+
+        # def button_submit(e):
+        #     main_answer_to_send = []
+        #     page.views.clear()
+        #     print(f'Распечатываем rows:{rows}')
+        #     for row in rows:
+        #         question_id = row.controls[0].question_id
+        #         main_answer_to_send.append({'question_id': question_id,
+        #                                     'user_answer': row.controls[
+        #                                         1].value})
+        #     api_manager.sent_answer_to_back(main_answer_to_send)
+        #     page.go("/test")
+        #     page.update()
+
+        # def button_click_recrut_login(e):
+        #     greetings.current.controls.append(
+        #         ft.Text(f'Hello {login.current.value}!')
+        #     )
+        #     result = api_manager.authorize(login.current.value,
+        #                                    password.current.value)
+        #     if result.status_code == 200:
+        #         if api_manager.get_role() == "RECRUT":
+        #             page.go("/test")
+        #         elif api_manager.get_role() == "ADMIN":
+        #             print("Зашел админ")
+        #     login_incorrect_label.visible = (result.status_code == 400)
+        #     page.update()
+        #
+        # def button_click_registration_form(e):
+        #     page.views.clear()
+        #     page.go("/registration")
+        #     page.update()
+
+    def button_click_create_recrut(e):
+        # 1)
+        # 2) Добавление пользователя в БД
+        pass
 
     def route_default(page: ft.Page):
         page.views.append(
@@ -145,7 +298,8 @@ def main(page: ft.Page):
         page.go(page.route)
         user_status = api_manager.get_user_hire_status()
         elevated_button = ft.ElevatedButton("Go Home",
-                                            on_click=lambda _: page.go("/"),
+                                            on_click=lambda _: page.go(
+                                                "/"),
                                             visible=False)
         recrut_questions_elements = __items(api_manager.get_question())
         view_statuses = ft.View(
@@ -173,7 +327,6 @@ def main(page: ft.Page):
 
     def route_registration(page: ft.Page):
         page.go(page.route)
-        print("Test")
         page.views.append(
             ft.View(
                 "/registration",
@@ -214,7 +367,8 @@ def main(page: ft.Page):
     def route_took_test(page: ft.Page):
         page.route = "/you_took_this_test"
         elevated_button = ft.ElevatedButton("Go Home",
-                                            on_click=lambda _: page.go("/"))
+                                            on_click=lambda _: page.go(
+                                                "/"))
         elevated_button.visible = True
         page.go(page.route)
         new_task = ft.Text("Вы уже проходили тестирование", width=300)

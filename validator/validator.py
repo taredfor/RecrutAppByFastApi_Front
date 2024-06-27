@@ -24,3 +24,17 @@ def validate_password(password: str):
 def validate_email(email: str):
     pattern = r"^[-\w\.]+@([-\w]+\.)+[-\w]{2,4}$" # TODO:исправить валидацию приема кириллицы
     return bool(re.match(pattern, email))
+
+def placeholder_validate(string: str):
+    return True
+
+def validate_second_password(main_password_str: str, second_password_str: str, ):
+    if validate_password(main_password_str):
+        if main_password_str == second_password_str:
+            second_password_incorrect_label.value = "Password is equiles"
+            second_password_incorrect_label.color = "Green"
+        else:
+            second_password_incorrect_label.value = "Password is not equiles"
+            second_password_incorrect_label.color = "Red"
+    else:
+        second_password_incorrect_label.value = ""
