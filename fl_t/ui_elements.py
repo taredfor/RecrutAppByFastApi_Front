@@ -37,37 +37,40 @@ class RegistrationFormTextField(
 
 
 class RegistrationFormSecondPasswordTextField(RegistrationFormTextField):
-    def __init__(self, label, ref, ref_main_password, incorrect_label=None,
+    def __init__(self, label, main_password_text_field: RegistrationFormTextField =None
+                 , incorrect_label=None,
                  outside_validator=None, parent_page=None,
                  good_validate_text=None, bad_validate_text=None):
-        self.ref_main_password = ref_main_password
-        super().__init__(label, ref, incorrect_label=incorrect_label,
+        self.main_password_text_field = main_password_text_field
+        super().__init__(label, incorrect_label=incorrect_label,
                          outside_validator=outside_validator,
                          parent_page=parent_page,
                          good_validate_text=good_validate_text,
                          bad_validate_text=bad_validate_text)
 
     def validate(self, _value):
-        if self.value == self.ref_main_password.current.value and self.ref_main_password.current.validated:
+        if self.value == self.main_password_text_field.value and self.main_password_text_field.validated:
             self.validated = True
         else:
             self.validated = False
         self.update_incorrect_label()
 
     def update_incorrect_label(self):
-        if not self.ref_main_password.current.validated:
+        if not self.main_password_text_field.validated:
             self.incorrect_label.value = "Enter correct main password"
+            self.incorrect_label.color = "Red"
             self.page.update()
             return
         super().update_incorrect_label()
 
 
 class RegistrationFormMainPasswordTextField(RegistrationFormTextField):
-    def __init__(self, label, ref, ref_second_password, incorrect_label=None,
+    def __init__(self, label, second_password_text_field: RegistrationFormSecondPasswordTextField, incorrect_label=None,
                  outside_validator=None, parent_page=None,
                  good_validate_text=None, bad_validate_text=None):
-        self.ref_second_password = ref_second_password
-        super().__init__(label, ref,
+        self.second_password_text_field = second_password_text_field
+        self.second_password_text_field.main_password_text_field = self
+        super().__init__(label,
                          incorrect_label=incorrect_label,
                          outside_validator=outside_validator,
                          parent_page=parent_page,
@@ -76,13 +79,7 @@ class RegistrationFormMainPasswordTextField(RegistrationFormTextField):
 
     def validate(self, _value):
         super().validate(_value)
-        self.ref_second_password.current.validate(_value)
-        #ref_second_password.current - object
-        #ref_second_password.current.value - value
-
-
-# ref_second_password -> ссылка на поле
-# во всех методах ua-elements протипизировтаь каждый аргумент
+        self.second_password_text_field.validate(_value)
 
 
 class RegistrationFormTextFieldUserLoginPassword(ft.TextField):

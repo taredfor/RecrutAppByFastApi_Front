@@ -39,14 +39,8 @@ def main(page: ft.Page):
 
     password = ft.Ref[ft.TextField]()
     greetings = ft.Ref[ft.Column]()
-    # login_incorrect_label = ft.Text("Login incorrect", visible=False)
-    first_name = ft.Ref[ft.TextField]()
-    second_name = ft.Ref[ft.TextField]()
-    e_mail = ft.Ref[ft.TextField]()
     planet = ft.Ref[ft.TextField]()
-    success_field = ft.Ref[ft.Text]()
-    main_password = ft.Ref[ft.TextField]()
-    second_password = ft.Ref[ft.TextField]()
+
     api_manager = ApiManager(page)
     login_incorrect_label = ft.Text("Add Login", visible=True,
                                     text_align=center)
@@ -56,7 +50,7 @@ def main(page: ft.Page):
                                               text_align=center)
     email_incorrect_label = ft.Text("Email", visible=True)
 
-    url_text_fileds = [password, e_mail, main_password, second_password]
+    #url_text_fileds = [password, e_mail, main_password, second_password]
 
     login = RegistrationFormTextField('Login',
         login_incorrect_label,
@@ -64,6 +58,38 @@ def main(page: ft.Page):
         page, "Login is Free",
         "Login exists"
         )
+
+    e_mail = RegistrationFormTextField('email',
+                              email_incorrect_label,
+                              validate_email, page,
+                              "Email is valid",
+                              "Email isn't valid"
+                              )
+
+    first_name = RegistrationFormTextField('First name',
+                              placeholder_validate)
+    second_name = RegistrationFormTextField('Second name',
+                              placeholder_validate)
+
+    second_password = RegistrationFormSecondPasswordTextField(
+                            'Second password',
+                             None,
+                            second_password_incorrect_label,
+                            None, page, "Password is equiles",
+                            "Password is not equiles"
+                        )
+
+    main_pass = RegistrationFormMainPasswordTextField('Main password',
+                                          second_password,
+                                          password_incorrect_label,
+                                          validate_password, page,
+                                          "Valid password",
+                                          "Password is not correct"
+                                          )
+
+    second_password.main_password_text_field = main_pass
+
+    url_text_fileds = [password, e_mail, second_password]
 
     def button_submit(e):
         main_answer_to_send = []
@@ -142,37 +168,19 @@ def main(page: ft.Page):
                             ),
                 ft.Row(
                     [
-                        RegistrationFormTextField('email', e_mail,
-                                                  email_incorrect_label,
-                                                  validate_email, page,
-                                                  "Email is valid",
-                                                  "Email isn't valid"
-                                                  ),
+                        e_mail,
                         email_incorrect_label
                     ]
                 ),
                 ft.Row(
                     [
-                        RegistrationFormMainPasswordTextField('Main password',
-                                                  main_password, second_password,
-                                                  password_incorrect_label,
-                                                  validate_password, page,
-                                                  "Valid password",
-                                                  "Password is not correct"
-                                                  ),
+                        main_pass,
                         password_incorrect_label
                     ]
                 ),
                 ft.Row(
                     [
-                        RegistrationFormSecondPasswordTextField(
-                            'Second password',
-                            # TODO: исправить валидацию проверки совпадения паролей
-                            second_password, main_password,
-                            second_password_incorrect_label,
-                            None, page, "Password is equiles",
-                            "Password is not equiles"
-                            ),
+                        second_password,
                         second_password_incorrect_label
                     ]
                 ),
