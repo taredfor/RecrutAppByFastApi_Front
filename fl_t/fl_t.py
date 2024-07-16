@@ -72,14 +72,11 @@ def main(page: ft.Page):
                               placeholder_validate)
 
     second_password = RegistrationFormSecondPasswordTextField(
-                            'Second password',
-                             None,
                             second_password_incorrect_label,
-                            None, page, "Password is equiles",
-                            "Password is not equiles"
+                            page
                         )
 
-    main_pass = RegistrationFormMainPasswordTextField('Main password',
+    main_pass = RegistrationFormMainPasswordTextField(
                                           second_password,
                                           password_incorrect_label,
                                           validate_password, page,

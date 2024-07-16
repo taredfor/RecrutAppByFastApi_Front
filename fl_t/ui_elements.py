@@ -37,16 +37,14 @@ class RegistrationFormTextField(
 
 
 class RegistrationFormSecondPasswordTextField(RegistrationFormTextField):
-    def __init__(self, label, main_password_text_field: RegistrationFormTextField =None
-                 , incorrect_label=None,
-                 outside_validator=None, parent_page=None,
-                 good_validate_text=None, bad_validate_text=None):
-        self.main_password_text_field = main_password_text_field
-        super().__init__(label, incorrect_label=incorrect_label,
-                         outside_validator=outside_validator,
+    def __init__(self, incorrect_label,
+                parent_page):
+        self.main_password_text_field = None
+        super().__init__("second password", incorrect_label=incorrect_label,
+                         outside_validator=None,
                          parent_page=parent_page,
-                         good_validate_text=good_validate_text,
-                         bad_validate_text=bad_validate_text)
+                         good_validate_text="Password is equiles",
+                         bad_validate_text="Password is not equiles")
 
     def validate(self, _value):
         if self.value == self.main_password_text_field.value and self.main_password_text_field.validated:
@@ -65,12 +63,12 @@ class RegistrationFormSecondPasswordTextField(RegistrationFormTextField):
 
 
 class RegistrationFormMainPasswordTextField(RegistrationFormTextField):
-    def __init__(self, label, second_password_text_field: RegistrationFormSecondPasswordTextField, incorrect_label=None,
+    def __init__(self, second_password_text_field: RegistrationFormSecondPasswordTextField, incorrect_label=None,
                  outside_validator=None, parent_page=None,
                  good_validate_text=None, bad_validate_text=None):
         self.second_password_text_field = second_password_text_field
         self.second_password_text_field.main_password_text_field = self
-        super().__init__(label,
+        super().__init__("Main password",
                          incorrect_label=incorrect_label,
                          outside_validator=outside_validator,
                          parent_page=parent_page,
