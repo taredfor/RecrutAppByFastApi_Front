@@ -7,7 +7,7 @@ import time
 
 class RegistrationFormTextField(
     ft.TextField):      #TODO поменять тип аргумента incorrect_label
-    def __init__(self, label: str, incorrect_label = None,
+    def __init__(self, label: str, incorrect_label,
                  outside_validator: Callable = None, parent_page: ft.Page = None,
                  good_validate_text: str = None, bad_validate_text: str =None):
         self.incorrect_label = incorrect_label
@@ -63,26 +63,27 @@ class RegistrationFormSecondPasswordTextField(RegistrationFormTextField):
 
 
 class RegistrationFormMainPasswordTextField(RegistrationFormTextField):
-    def __init__(self, second_password_text_field: RegistrationFormSecondPasswordTextField, incorrect_label=None,
-                 outside_validator=None, parent_page=None,
-                 good_validate_text=None, bad_validate_text=None):
+    def __init__(self, second_password_text_field: RegistrationFormSecondPasswordTextField,
+                 incorrect_label,
+                 outside_validator,
+                 parent_page):
         self.second_password_text_field = second_password_text_field
         self.second_password_text_field.main_password_text_field = self
         super().__init__("Main password",
                          incorrect_label=incorrect_label,
                          outside_validator=outside_validator,
                          parent_page=parent_page,
-                         good_validate_text=good_validate_text,
-                         bad_validate_text=bad_validate_text)
+                         good_validate_text="Valid password",
+                         bad_validate_text="Password is not correct")
 
     def validate(self, _value):
         super().validate(_value)
         self.second_password_text_field.validate(_value)
 
 
-class RegistrationFormTextFieldUserLoginPassword(ft.TextField):
-    def __init__(self, label, ref):
-        super().__init__(ref=ref, label=label, autofocus=True,
+class RegistrationFormTextFieldUserLogin(ft.TextField):
+    def __init__(self, label):
+        super().__init__(label=label, autofocus=True,
                          text_align=center, width=200, height=50)
 
 

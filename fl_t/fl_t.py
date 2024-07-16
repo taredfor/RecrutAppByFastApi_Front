@@ -7,7 +7,7 @@ from validator.validator import validate_password, validate_email, \
     placeholder_validate
 from api_manager.api_manager import ApiManager
 from fl_t.ui_elements import RegistrationFormTextField, Button, \
-    RegistrationFormTextFieldUserLoginPassword, \
+    RegistrationFormTextFieldUserLogin, \
     RegistrationFormSecondPasswordTextField, \
     RegistrationFormMainPasswordTextField, \
     RegistrationButton
@@ -79,9 +79,7 @@ def main(page: ft.Page):
     main_pass = RegistrationFormMainPasswordTextField(
                                           second_password,
                                           password_incorrect_label,
-                                          validate_password, page,
-                                          "Valid password",
-                                          "Password is not correct"
+                                          validate_password, page
                                           )
 
     second_password.main_password_text_field = main_pass
@@ -128,9 +126,8 @@ def main(page: ft.Page):
     def column_with_horizont_alignment(align: ft.CrossAxisAlignment):
         return ft.Column(
             [
-                RegistrationFormTextFieldUserLoginPassword('Login', login),
-                RegistrationFormTextFieldUserLoginPassword('Password',
-                                                           password),
+                RegistrationFormTextFieldUserLogin('Login'),
+                RegistrationFormTextFieldUserLogin('Password'),
                 Button("To come in", button_click_recrut_login),
                 Button("Registration", button_click_registration_form),
             ],
